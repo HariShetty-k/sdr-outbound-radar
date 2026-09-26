@@ -36,6 +36,9 @@ yarn-error.log*
 .env*
 !.env*.example
 
+# private business data — existing/processed account lists, not for the public repo
+/scripts/data/
+
 # vercel
 .vercel
 
