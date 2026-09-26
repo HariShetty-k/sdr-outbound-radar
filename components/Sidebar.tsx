@@ -112,10 +112,16 @@ function NavItem({
   return (
     <Link
       href={href}
-      className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-[14px] font-medium"
+      className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-[14px] font-medium transition-colors duration-150"
       style={{
         background: active ? "rgba(255,255,255,0.08)" : "transparent",
         color: active ? "#fff" : "var(--sidebar-soft)",
+      }}
+      onMouseEnter={(e) => {
+        if (!active) e.currentTarget.style.background = "rgba(255,255,255,0.05)";
+      }}
+      onMouseLeave={(e) => {
+        if (!active) e.currentTarget.style.background = "transparent";
       }}
     >
       <svg className="h-[18px] w-[18px] flex-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}>

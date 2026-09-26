@@ -1,9 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { motion, type Variants } from "motion/react";
 import { Sidebar } from "@/components/Sidebar";
 import { ProcessedRow, getProcessed, getCounts } from "@/lib/supabase";
 import { initials, logoColor } from "@/lib/logo";
+
+const listVariants: Variants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.04 } },
+};
+
+const rowVariants: Variants = {
+  hidden: { opacity: 0, y: 8 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.25, ease: "easeOut" } },
+};
 
 function pillStyle(outcome: string): { className: string; bg: string; color: string } {
   const o = outcome.toLowerCase();
@@ -66,7 +77,12 @@ export default function ProcessedPage() {
       <Sidebar active="processed" newCount={counts.newCount} processedCount={counts.processedCount} />
 
       <div className="flex flex-1 flex-col gap-5.5 p-9" style={{ padding: "36px 44px", gap: 22 }}>
-        <div className="flex items-start justify-between">
+        <motion.div
+          className="flex items-start justify-between"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+        >
           <div>
             <div
               className="mb-1.5 text-[12px] font-semibold uppercase"
@@ -81,7 +97,9 @@ export default function ProcessedPage() {
               Every brand you&apos;ve reviewed — excluded from future daily matches automatically.
             </div>
           </div>
-          <button
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={exportCsv}
             className="flex h-fit items-center gap-2 rounded-[9px] px-4 py-2.5 text-[13px] font-semibold"
             style={{ background: "var(--surface)", border: "1px solid var(--line)", padding: "10px 16px" }}
@@ -90,10 +108,15 @@ export default function ProcessedPage() {
               <path d="M12 3v13m0 0-4-4m4 4 4-4M4 21h16" />
             </svg>
             Export CSV
-          </button>
-        </div>
+          </motion.button>
+        </motion.div>
 
-        <div className="flex items-center gap-2.5">
+        <motion.div
+          className="flex items-center gap-2.5"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.05, ease: "easeOut" }}
+        >
           <div
             className="flex max-w-[340px] flex-1 items-center gap-2.5 rounded-[9px] px-3.5 py-2.5"
             style={{ background: "var(--surface)", border: "1px solid var(--line)" }}
@@ -122,11 +145,14 @@ export default function ProcessedPage() {
           >
             All outcomes
           </div>
-        </div>
+        </motion.div>
 
-        <div
+        <motion.div
           className="flex flex-1 flex-col overflow-hidden rounded-[14px]"
           style={{ background: "var(--surface)", border: "1px solid var(--line)" }}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, delay: 0.1, ease: "easeOut" }}
         >
           <div
             className="grid gap-3 px-5.5 py-3.5 text-[11px] font-semibold uppercase"
@@ -158,12 +184,15 @@ export default function ProcessedPage() {
             </div>
           )}
 
-          {!loading &&
-            filtered.map((row) => {
+          {!loading && (
+            <motion.div variants={listVariants} initial="hidden" animate="show">
+              {filtered.map((row) => {
               const pill = pillStyle(row.outcome);
               return (
-                <div
+                <motion.div
                   key={row.id}
+                  variants={rowVariants}
+                  whileHover={{ backgroundColor: "#faf6f0" }}
                   className="grid items-center gap-3 px-5.5 py-3.5"
                   style={{
                     gridTemplateColumns: "1.9fr 1fr 1.2fr 1fr 1fr 0.7fr",
@@ -206,10 +235,12 @@ export default function ProcessedPage() {
                     {row.sdr?.name ?? "Unassigned"}
                   </div>
                   <div />
-                </div>
+                </motion.div>
               );
-            })}
-        </div>
+              })}
+            </motion.div>
+          )}
+        </motion.div>
       </div>
     </div>
   );

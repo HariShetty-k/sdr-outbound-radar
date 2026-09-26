@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Sora, IBM_Plex_Sans } from "next/font/google";
+import { MotionConfig } from "motion/react";
 import "./globals.css";
 
 const sora = Sora({
@@ -22,7 +23,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${sora.variable} ${plexSans.variable}`}>
-      <body>{children}</body>
+      <body>
+        <MotionConfig reducedMotion="user">{children}</MotionConfig>
+      </body>
     </html>
   );
 }

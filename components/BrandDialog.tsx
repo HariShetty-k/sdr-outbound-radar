@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
 import { Brand, DecisionMaker, MenuItem, getBrandDetail, markProcessed } from "@/lib/supabase";
 import { initials, logoColor } from "@/lib/logo";
 
@@ -22,7 +23,7 @@ export function BrandDialog({
   onClose,
   onProcessed,
 }: {
-  brandId: string;
+  brandId: string | null;
   onClose: () => void;
   onProcessed: () => void;
 }) {
@@ -34,12 +35,15 @@ export function BrandDialog({
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
+    if (!brandId) return;
     let cancelled = false;
+    setLoading(true);
     getBrandDetail(brandId).then((detail) => {
       if (cancelled) return;
       setBrand(detail.brand);
       setDecisionMakers(detail.decisionMakers);
       setMenuItems(detail.menuItems);
+      setNotes("");
       setLoading(false);
     });
     return () => {
@@ -48,6 +52,7 @@ export function BrandDialog({
   }, [brandId]);
 
   async function handleMarkProcessed() {
+    if (!brandId) return;
     setSubmitting(true);
     try {
       await markProcessed(brandId, "contacted", notes);
@@ -58,11 +63,28 @@ export function BrandDialog({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: "rgba(28,20,12,0.55)" }}>
-      <div
-        className="flex max-h-[85vh] w-[900px] max-w-[95vw] flex-col overflow-hidden rounded-[18px]"
-        style={{ background: "var(--surface)", boxShadow: "0 30px 60px -20px rgba(20,12,4,0.45)" }}
-      >
+    <AnimatePresence>
+      {brandId && (
+        <motion.div
+          key="dialog-scrim"
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          style={{ background: "rgba(28,20,12,0.55)" }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+          onClick={onClose}
+        >
+          <motion.div
+            key="dialog-modal"
+            className="flex max-h-[85vh] w-[900px] max-w-[95vw] flex-col overflow-hidden rounded-[18px]"
+            style={{ background: "var(--surface)", boxShadow: "0 30px 60px -20px rgba(20,12,4,0.45)" }}
+            initial={{ opacity: 0, scale: 0.97, y: 12 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.97, y: 12 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            onClick={(e) => e.stopPropagation()}
+          >
         {loading || !brand ? (
           <div className="p-10 text-sm" style={{ color: "var(--ink-soft)" }}>
             Loading…
@@ -251,7 +273,9 @@ export function BrandDialog({
               className="flex items-center gap-3 px-7.5 py-4.5"
               style={{ padding: "18px 30px", borderTop: "1px solid var(--line)", background: "#faf6f0" }}
             >
-              <button
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={onClose}
                 className="flex items-center gap-2 rounded-[9px] px-4.5 py-2.5 text-[13.5px] font-semibold"
                 style={{ border: "1px solid var(--line)", color: "var(--ink-soft)", padding: "11px 18px" }}
@@ -260,8 +284,10 @@ export function BrandDialog({
                   <path d="M12 19V5M5 12l7-7 7 7" />
                 </svg>
                 Skip for now
-              </button>
-              <button
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: submitting ? 1 : 1.02 }}
+                whileTap={{ scale: submitting ? 1 : 0.98 }}
                 onClick={handleMarkProcessed}
                 disabled={submitting}
                 className="ml-auto flex items-center gap-2 rounded-[9px] px-4.5 py-2.5 text-[13.5px] font-semibold text-white disabled:opacity-60"
@@ -271,12 +297,14 @@ export function BrandDialog({
                   <path d="M20 6 9 17l-5-5" />
                 </svg>
                 {submitting ? "Saving…" : "Mark as processed"}
-              </button>
+              </motion.button>
             </div>
           </>
         )}
-      </div>
-    </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 
