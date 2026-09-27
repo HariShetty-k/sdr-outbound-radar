@@ -131,3 +131,24 @@ export async function getCounts(): Promise<{ newCount: number; processedCount: n
   ]);
   return { newCount: newBrands.length, processedCount: processedCount ?? 0 };
 }
+
+export type SyncLog = {
+  id: string;
+  source: string;
+  synced_at: string;
+  candidates_tried: number;
+  brands_found: number;
+  quota_hit: boolean;
+};
+
+/** Most recent discovery pipeline run — reflects when the tool actually last synced against Google Places, not just when the page loaded. */
+export async function getLastSync(): Promise<SyncLog | null> {
+  const { data, error } = await supabase
+    .from("sync_log")
+    .select("*")
+    .order("synced_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+}

@@ -5,6 +5,7 @@ import { motion, type Variants } from "motion/react";
 import { Sidebar } from "@/components/Sidebar";
 import { BrandDialog } from "@/components/BrandDialog";
 import { FilterDrawer, BrandFilters } from "@/components/FilterDrawer";
+import { LastSynced } from "@/components/LastSynced";
 import { Brand, getNewBrands, getCounts } from "@/lib/supabase";
 import { initials, logoColor } from "@/lib/logo";
 
@@ -85,7 +86,8 @@ export default function NewBrandsPage() {
               {counts.processedCount} brand{counts.processedCount === 1 ? "" : "s"} already processed.
             </div>
           </div>
-          <motion.button
+          <div className="flex flex-col items-end gap-2">
+            <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={refresh}
@@ -105,7 +107,9 @@ export default function NewBrandsPage() {
               <path d="M21 3v6h-6" />
             </motion.svg>
             Refresh matches
-          </motion.button>
+            </motion.button>
+            <LastSynced />
+          </div>
         </motion.div>
 
         <motion.div

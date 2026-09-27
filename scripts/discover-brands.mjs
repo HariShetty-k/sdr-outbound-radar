@@ -103,8 +103,10 @@ async function main() {
 
   const newIcpMatches = [];
   let quotaHit = false;
+  let candidatesTried = 0;
 
   for (const name of toTry) {
+    candidatesTried++;
     try {
       const result = await discoverBrand(name);
       const icpMatch = result.outlet_count >= 5;
@@ -127,7 +129,13 @@ async function main() {
   }
 
   saveProgress(progress);
-  console.log(JSON.stringify({ newIcpMatches, quotaHit, remaining: toTry.length - newIcpMatches.length }, null, 2));
+  console.log(
+    JSON.stringify(
+      { newIcpMatches, quotaHit, candidatesTried, remaining: toTry.length - candidatesTried },
+      null,
+      2
+    )
+  );
 }
 
 main();
